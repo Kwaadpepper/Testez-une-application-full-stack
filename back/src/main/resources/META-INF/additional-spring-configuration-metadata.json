@@ -1,0 +1,14 @@
+{
+    "properties": [
+        {
+            "name": "oc.app.jwtSecret",
+            "type": "java.lang.String",
+            "description": "Oc Jwt secret"
+        },
+        {
+            "name": "oc.app.jwtExpirationMs",
+            "type": "java.lang.String",
+            "description": "Oc Jwt expiration timeout in ms"
+        }
+    ]
+}
