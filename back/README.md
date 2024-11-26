@@ -9,3 +9,4 @@ GL
 
 Java: 11
 Maven: 3.9.9
+Mysql: 8

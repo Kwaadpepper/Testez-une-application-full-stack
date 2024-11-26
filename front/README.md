@@ -70,3 +70,9 @@ Launching test:
 for following change:
 
 > npm run test:watch
+
+## Versions
+
+Node: 16/gallium
+Npm: 8.19.4
+Yarn: 1.22.22
