@@ -2,13 +2,12 @@ package com.openclassrooms.starterjwt.services;
 
 import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.UserRepository;
-
-import io.jsonwebtoken.lang.Assert;
 
 public class UserServiceTest {
     private final UserRepository userRepository;
@@ -30,7 +29,9 @@ public class UserServiceTest {
 
         // Assert
         Mockito.verify(userRepository).findById(Mockito.any(Long.class));
-        Assert.isTrue(output.equals(user), "The user found on the repository should be returned");
+        Assertions.assertThat(output)
+                .as("The user found on the repository should be returned")
+                .isEqualTo(user);
     }
 
     @Test
@@ -46,7 +47,9 @@ public class UserServiceTest {
 
         // Assert
         Mockito.verify(userRepository).findById(Mockito.any(Long.class));
-        Assert.isNull(output, "Null should be returned if the user is missing");
+        Assertions.assertThat(output)
+                .as("Null should be returned if the user is missing")
+                .isNull();
     }
 
     @Test
