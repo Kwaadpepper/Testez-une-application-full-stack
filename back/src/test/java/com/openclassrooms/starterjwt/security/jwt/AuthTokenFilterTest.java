@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,13 +27,17 @@ public class AuthTokenFilterTest {
     private AuthTokenFilter authTokenFilter;
 
     public AuthTokenFilterTest() {
-        this.securityContext = Mockito.mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
         this.jwtUtils = Mockito.mock(JwtUtils.class);
         this.userDetailsService = Mockito.mock(UserDetailsServiceImpl.class);
         this.authTokenFilter = new AuthTokenFilter();
         ReflectionTestUtils.setField(authTokenFilter, "jwtUtils", jwtUtils);
         ReflectionTestUtils.setField(authTokenFilter, "userDetailsService", userDetailsService);
+    }
+
+    @BeforeEach
+    public void init() {
+        this.securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
     }
 
     @Test
