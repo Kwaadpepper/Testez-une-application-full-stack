@@ -19,5 +19,6 @@ describe('account',()=>{
 
     cy.get('[routerlink="me"]').click()
     cy.get('h1').should("contain", "User information")
+    cy.get('.mat-card-content > div.ng-star-inserted > :nth-child(1)').should("contain", "Name: firstName LASTNAME")
   })
 })
