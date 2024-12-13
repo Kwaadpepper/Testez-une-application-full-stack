@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS USERS;
 DROP TABLE IF EXISTS TEACHERS;
 
 CREATE TABLE USERS (
-  id int NOT NULL,
+  id int NOT NULL auto_increment,
   last_name varchar(40) DEFAULT NULL,
   first_name varchar(40) DEFAULT NULL,
   admin tinyint NOT NULL DEFAULT 0,
@@ -16,7 +16,7 @@ CREATE TABLE USERS (
 );
 
 CREATE TABLE TEACHERS (
-  id int NOT NULL,
+  id int NOT NULL auto_increment,
   last_name varchar(40) DEFAULT NULL,
   first_name varchar(40) DEFAULT NULL,
   created_at timestamp(0) NULL DEFAULT current_timestamp(),
@@ -25,7 +25,7 @@ CREATE TABLE TEACHERS (
 );
 
 CREATE TABLE SESSIONS (
-  id int NOT NULL,
+  id int NOT NULL auto_increment,
   name varchar(50) DEFAULT NULL,
   description varchar(2000) DEFAULT NULL,
   date timestamp(0) NULL DEFAULT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE SESSIONS (
 CREATE INDEX teacher_id ON SESSIONS (teacher_id);
 
 CREATE TABLE PARTICIPATE (
-  user_id int DEFAULT NULL,
+  user_id int DEFAULT NULL auto_increment,
   session_id int DEFAULT NULL,
   CONSTRAINT PARTICIPATE_ibfk_1 FOREIGN KEY (user_id) REFERENCES USERS (id),
   CONSTRAINT PARTICIPATE_ibfk_2 FOREIGN KEY (session_id) REFERENCES SESSIONS (id)
