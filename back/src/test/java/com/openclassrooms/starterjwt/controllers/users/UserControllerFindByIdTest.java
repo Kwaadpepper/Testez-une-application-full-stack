@@ -1,8 +1,5 @@
 package com.openclassrooms.starterjwt.controllers.users;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,12 +29,14 @@ public class UserControllerFindByIdTest {
         User user = Mockito.mock(User.class);
         UserDto userDto = Mockito.mock(UserDto.class);
         Mockito.when(userService.findById(Mockito.any(Long.class))).thenReturn(user);
-        Mockito.when(userMapper.toDto(Mockito.anyList())).thenReturn(new ArrayList<>(List.of(userDto)));
+        Mockito.when(userMapper.toDto(Mockito.any(User.class))).thenReturn(userDto);
 
         // Act
         ResponseEntity<?> output = userController.findById(userID);
 
         // Act
+        Mockito.verify(userService).findById(Mockito.any(Long.class));
+        Mockito.verify(userMapper).toDto(Mockito.any(User.class));
         Assertions.assertThat(output)
                 .extracting(ResponseEntity::getStatusCodeValue)
                 .isEqualTo(200)
@@ -54,6 +53,7 @@ public class UserControllerFindByIdTest {
         ResponseEntity<?> output = userController.findById(userID);
 
         // Act
+        Mockito.verify(userService).findById(Mockito.any(Long.class));
         Assertions.assertThat(output)
                 .extracting(ResponseEntity::getStatusCodeValue)
                 .isEqualTo(404)
@@ -64,7 +64,6 @@ public class UserControllerFindByIdTest {
     public void canFindUserByIdWouldBeRejectedOnBadInput() {
         // Arrange
         String userID = "badNumber";
-        Mockito.when(userService.findById(Mockito.any(Long.class))).thenReturn(null);
 
         // Act
         ResponseEntity<?> output = userController.findById(userID);

@@ -51,6 +51,11 @@ public class UserControllerDeleteTest {
         ResponseEntity<?> output = userController.save(userID);
 
         // Act
+        Mockito.verify(userService).findById(Mockito.any(Long.class));
+        Mockito.verify(securityContext).getAuthentication();
+        Mockito.verify(auth).getPrincipal();
+        Mockito.verify(user).getEmail();
+        Mockito.verify(userDetails).getUsername();
         Assertions.assertThat(output)
                 .extracting(ResponseEntity::getStatusCodeValue)
                 .isEqualTo(200)
@@ -68,6 +73,7 @@ public class UserControllerDeleteTest {
         ResponseEntity<?> output = userController.save(userID);
 
         // Act
+        Mockito.verify(userService).findById(Mockito.any(Long.class));
         Assertions.assertThat(output)
                 .extracting(ResponseEntity::getStatusCodeValue)
                 .isEqualTo(404)
@@ -92,6 +98,11 @@ public class UserControllerDeleteTest {
         ResponseEntity<?> output = userController.save(userID);
 
         // Act
+        Mockito.verify(userService).findById(Mockito.any(Long.class));
+        Mockito.verify(securityContext).getAuthentication();
+        Mockito.verify(auth).getPrincipal();
+        Mockito.verify(user).getEmail();
+        Mockito.verify(userDetails).getUsername();
         Assertions.assertThat(output)
                 .extracting(ResponseEntity::getStatusCodeValue)
                 .isEqualTo(401)
