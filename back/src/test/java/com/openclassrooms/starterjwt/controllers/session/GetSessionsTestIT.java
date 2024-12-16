@@ -1,4 +1,4 @@
-package com.openclassrooms.starterjwt.integration.sessions;
+package com.openclassrooms.starterjwt.controllers.session;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;

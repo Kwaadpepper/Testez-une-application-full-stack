@@ -1,4 +1,4 @@
-package com.openclassrooms.starterjwt.integration.sessions;
+package com.openclassrooms.starterjwt.controllers.session;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
