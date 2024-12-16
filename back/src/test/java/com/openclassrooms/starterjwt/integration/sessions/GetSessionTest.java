@@ -1,10 +1,7 @@
-package com.openclassrooms.starterjwt.e2e.sessions;
+package com.openclassrooms.starterjwt.integration.sessions;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasItem;
-
-import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.json.JSONException;
@@ -27,7 +24,7 @@ import io.restassured.http.ContentType;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GetSessionsTest {
+public class GetSessionTest {
 
     private static final String BASE_URL = "/api/session";
 
@@ -57,26 +54,27 @@ public class GetSessionsTest {
 
     @Test
     void canGetSessionsList() {
-        List<Session> sessionList = sessionService.findAll();
-        Assertions.assertThat(sessionList)
-                .size().isGreaterThan(0);
+        Session session = sessionService.getById(1L);
+        Assertions.assertThat(session)
+                .returns("Session name", Assertions.from(Session::getName))
+                .returns("Session description", Assertions.from(Session::getDescription));
     }
 
     @Test
-    void canGetSessionsListFromEndpoint() throws JSONException {
+    void canGetSessionFromEndpoint() throws JSONException {
         RestAssured
                 .given()
                 .header("Authorization", "Bearer " + jwt)
                 .contentType(ContentType.JSON)
                 .log().uri()
                 .log().method()
-                .when().get(BASE_URL)
+                .when().get(BASE_URL + "/1")
                 .then()
                 .log().status()
                 .log().body()
                 .statusCode(200)
-                .body("", hasItem(allOf(
+                .body("", allOf(
                         hasEntry("name", "Session name"),
-                        hasEntry("description", "Session description"))));
+                        hasEntry("description", "Session description")));
     }
 }

@@ -1,4 +1,4 @@
-package com.openclassrooms.starterjwt.e2e.auth;
+package com.openclassrooms.starterjwt.integration.auth;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
