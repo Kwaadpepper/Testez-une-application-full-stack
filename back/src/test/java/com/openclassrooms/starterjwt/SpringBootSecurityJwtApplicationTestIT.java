@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest
-public class SpringBootSecurityJwtApplicationTests {
+public class SpringBootSecurityJwtApplicationTestIT {
 
 	@Test
 	public void contextLoads() {

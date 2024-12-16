@@ -5,6 +5,10 @@ For launch and generate the jacoco code coverage:
 
 GL
 
+## Test results
+
+- Reports can be found under `target/coverage-jacoco`
+
 ## Versions
 
 Java: 11

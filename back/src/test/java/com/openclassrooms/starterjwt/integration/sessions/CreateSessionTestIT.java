@@ -27,7 +27,7 @@ import io.restassured.http.ContentType;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CreateSessionTest {
+public class CreateSessionTestIT {
 
     private static final String BASE_URL = "/api/session";
 

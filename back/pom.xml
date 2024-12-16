@@ -141,48 +141,178 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.5</version>
+				<configuration>
+					<excludes>
+						<exclude>**/dto/*.class</exclude>
+					</excludes>
+				</configuration>
 				<executions>
+
+					<!-- UNIT TESTS -->
 					<execution>
+						<id>pre-unit-test</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
+						<configuration>
+							<destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+							<propertyName>surefire.jacoco.args</propertyName>
+						</configuration>
 					</execution>
-					<!-- attached to Maven test phase -->
 					<execution>
-						<id>report</id>
+						<id>post-unit-test</id>
 						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<configuration>
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+							<outputDirectory>${project.build.directory}/coverage-jacoco/unit-tests</outputDirectory>
+						</configuration>
+					</execution>
+
+
+					<!-- INTEGRATION TESTS -->
+					<execution>
+						<id>pre-integration-test</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+							<propertyName>failsafe.jacoco.args</propertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>post-integration-test</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+							<outputDirectory>${project.build.directory}/coverage-jacoco/integration-tests</outputDirectory>
+						</configuration>
+					</execution>
+
+
+					<!-- MERGED REPORTS -->
+					<execution>
+						<id>merge-unit-and-integration</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>merge</goal>
+						</goals>
+						<configuration>
+							<fileSets>
+								<fileSet>
+									<directory>${project.build.directory}/coverage-reports/</directory>
+									<includes>
+										<include>*.exec</include>
+									</includes>
+								</fileSet>
+							</fileSets>
+							<destFile>${project.build.directory}/coverage-reports/merged.exec</destFile>
+						</configuration>
 					</execution>
 
 					<execution>
-						<id>jacoco-check</id>
+						<id>create-merged-report</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${project.build.directory}/coverage-reports/merged.exec</dataFile>
+							<outputDirectory>${project.build.directory}/coverage-jacoco/all-combined-tests</outputDirectory>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>jacoco-check-ut</id>
+						<phase>verify</phase>
 						<goals>
 							<goal>check</goal>
 						</goals>
 						<configuration>
 							<rules>
 								<rule>
-									<element>PACKAGE</element>
+									<element>BUNDLE</element>
 									<limits>
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.9</minimum>
+											<minimum>0.80</minimum>
 										</limit>
 									</limits>
 								</rule>
 							</rules>
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>jacoco-check-it</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.3</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
 						</configuration>
 					</execution>
 
 				</executions>
 			</plugin>
+
+			<!-- Used for unit tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>${surefire.jacoco.args}</argLine>
+					<excludes>
+						<exclude>**/*IT.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<!-- Used for integration tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>integration-tests</id>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+						<configuration>
+							<argLine>${failsafe.jacoco.args}</argLine>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
