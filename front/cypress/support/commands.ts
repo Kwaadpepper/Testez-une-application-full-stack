@@ -9,7 +9,7 @@ declare namespace Cypress {
   }
 }
 
-function loginCommand() {
+function loginCommand(sessions = []) {
   cy.visit('/login')
 
   cy.intercept('POST', '/api/auth/login', {
@@ -27,7 +27,7 @@ function loginCommand() {
       method: 'GET',
       url: '/api/session',
     },
-    []).as('session')
+    sessions).as('session')
 
   cy.get('input[formControlName=email]').type("yoga@studio.com")
   cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
