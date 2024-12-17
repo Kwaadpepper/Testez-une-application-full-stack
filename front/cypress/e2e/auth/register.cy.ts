@@ -1,11 +1,5 @@
 
 describe('Register spec', () => {
-  let existingUser = 0;
-
-  before(() => {
-    // Initialisation ou préparation des prérequis si nécessaire
-  });
-
   it('Register successful', () => {
     cy.visit('/register');
     cy.intercept('POST', '/api/auth/register',

@@ -3,11 +3,36 @@
 // with Intellisense and code completion in your
 // IDE or Text Editor.
 // ***********************************************
-// declare namespace Cypress {
-//   interface Chainable<Subject = any> {
-//     customCommand(param: any): typeof customCommand;
-//   }
-// }
+declare namespace Cypress {
+  interface Chainable<Subject = any> {
+    login(): typeof loginCommand;
+  }
+}
+
+function loginCommand() {
+  cy.visit('/login')
+
+  cy.intercept('POST', '/api/auth/login', {
+    body: {
+      id: 1,
+      username: 'userName',
+      firstName: 'firstName',
+      lastName: 'lastName',
+      admin: true
+    },
+  })
+
+  cy.intercept(
+    {
+      method: 'GET',
+      url: '/api/session',
+    },
+    []).as('session')
+
+  cy.get('input[formControlName=email]').type("yoga@studio.com")
+  cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+}
+
 //
 // function customCommand(param: any): void {
 //   console.warn(param);
@@ -15,6 +40,8 @@
 //
 // NOTE: You can use it like so:
 // Cypress.Commands.add('customCommand', customCommand);
+Cypress.Commands.add('login', loginCommand);
+
 //
 // ***********************************************
 // This example commands.js shows you how to
@@ -41,27 +68,3 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
-
-Cypress.Commands.add('login', () => {
-  cy.visit('/login')
-
-  cy.intercept('POST', '/api/auth/login', {
-    body: {
-      id: 1,
-      username: 'userName',
-      firstName: 'firstName',
-      lastName: 'lastName',
-      admin: true
-    },
-  })
-
-  cy.intercept(
-    {
-      method: 'GET',
-      url: '/api/session',
-    },
-    []).as('session')
-
-  cy.get('input[formControlName=email]').type("yoga@studio.com")
-  cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
-});

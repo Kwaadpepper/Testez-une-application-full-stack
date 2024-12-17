@@ -1,6 +1,6 @@
-describe('account',()=>{
+describe('Create Session spec',()=>{
   before(() => {
-    cy.login(); // Appelle la commande login
+    cy.login()
     cy.intercept('GET', '/api/user/1',
       {
         body: {
