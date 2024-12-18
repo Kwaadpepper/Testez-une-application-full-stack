@@ -3,9 +3,10 @@
 // with Intellisense and code completion in your
 // IDE or Text Editor.
 // ***********************************************
+import session from "./../fixtures/session.json";
 declare namespace Cypress {
   interface Chainable<Subject = any> {
-    login(): typeof loginCommand;
+    login(sessions: typeof session[], isAdmin: boolean): typeof loginCommand;
   }
 }
 
