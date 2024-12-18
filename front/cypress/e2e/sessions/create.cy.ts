@@ -1,35 +1,20 @@
-describe('Create Session spec',()=>{
+describe('Create Session spec',() => {
   before(() => {
-    cy.login()
-    cy.intercept('GET', '/api/user/1',
-      {
-        body: {
-          id: 1,
-          email: 'toto@example.net',
-          firstName: 'firstName',
-          lastName: 'lastName',
-          admin: true,
-          createdAt: '2021/02/22',
-          updatedAt: '2021/02/22'
-        }
-      })
-    });
-  it('should show interface to create and persist a session', () => {
-    cy.intercept('GET', '/api/teacher',
-      {
-        statusCode: 200,
-        body: [
-          {
-            id: 1,
-            firstName: 'Teacher 1',
-            lastName: 'lastName',
-            createdAt: '2021/02/22',
-            updatedAt: '2021/02/22'
-          }
-        ]
-      }).as('getTeachers')
+    cy.fixture('user').then((user) => {
+      cy.intercept('GET', '/api/user/1', { body: user }).as('getUser')
+    })
+    cy.fixture('session').then((session) => {
+      cy.login([session, {...session, ...{ id: 2 }}])
+    })
+  })
 
-      cy.intercept('POST', '/api/session', { statusCode: 200 }).as('sessionCreate')
+  it('should show interface to create and persist a session', () => {
+    cy.fixture('teacher').then((teacher) => {
+      teacher.firstName = "Teacher 1"
+      teacher.lastName = "lastName"
+      cy.intercept('GET', '/api/teacher', { body: [teacher] }).as('getTeachers')
+    })
+    cy.intercept('POST', '/api/session', { statusCode: 200 }).as('sessionCreate')
 
     cy.get('[routerlink="sessions"]').click()
     cy.get('.mat-card-header > .mat-focus-indicator').click()

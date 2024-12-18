@@ -9,17 +9,11 @@ declare namespace Cypress {
   }
 }
 
-function loginCommand(sessions = []) {
+function loginCommand(sessions = [], isAdmin = true) {
   cy.visit('/login')
-
-  cy.intercept('POST', '/api/auth/login', {
-    body: {
-      id: 1,
-      username: 'userName',
-      firstName: 'firstName',
-      lastName: 'lastName',
-      admin: true
-    },
+  cy.fixture('user').then((user) => {
+    user.admin = isAdmin
+    cy.intercept('POST', '/api/auth/login', { body: user }).as('getUser')
   })
 
   cy.intercept(

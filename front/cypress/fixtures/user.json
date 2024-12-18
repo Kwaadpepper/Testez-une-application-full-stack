@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "email": "toto@example.net",
+  "firstName": "firstName",
+  "lastName": "lastName",
+  "admin": true,
+  "createdAt": "2021/02/22",
+  "updatedAt": "2021/02/22"
+}
