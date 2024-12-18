@@ -1,0 +1,11 @@
+import './account.cy'
+import './auth/login.cy'
+import './auth/logout.cy'
+import './auth/register.cy'
+import './sessions/create.cy'
+import './sessions/delete.cy'
+import './sessions/edit.cy'
+import './sessions/list.cy'
+import './sessions/participate.cy'
+import './sessions/view-session-detail.cy'
+
