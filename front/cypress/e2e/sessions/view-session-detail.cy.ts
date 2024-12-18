@@ -14,7 +14,7 @@ describe('View Session Detail spec', () => {
     cy.intercept('GET', '/api/teacher/1', { body: teacher }).as("Get teacher")
 
     cy.get('.items > .mat-card').should("have.length.at.least", 1)
-    cy.get('.mat-card-actions > :nth-child(1)').click()
-  });
+    cy.get('[data-test-details="1"]').click()
+  })
 
 })

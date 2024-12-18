@@ -12,6 +12,6 @@ describe('List Sessions spec', () => {
 
   it('should list sessions',() => {
     cy.get('.items > .mat-card').should("have.length.at.least", 2)
-  });
+  })
 
 })
