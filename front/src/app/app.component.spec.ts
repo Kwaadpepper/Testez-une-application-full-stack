@@ -5,6 +5,7 @@ import { expect } from '@jest/globals';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { AppComponent } from './app.component';
 import { SessionService } from './services/session.service';
 
@@ -50,6 +51,7 @@ describe('AppComponent', () => {
 
     // Assert
     expect(app).toBeTruthy()
+    expect(firstValueFrom(app.$isLogged())).toBeTruthy()
     expect(sessionService.logOut).toHaveBeenCalledTimes(1)
     expect(router.navigate).toHaveBeenCalledWith([''])
   })
