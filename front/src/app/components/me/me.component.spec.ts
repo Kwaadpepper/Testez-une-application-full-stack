@@ -83,6 +83,18 @@ describe('MeComponent', () => {
     expect(component).toBeTruthy()
   })
 
+  it('should go back', () => {
+    // Arrange
+    window.history.back = jest.fn()
+
+    // Act
+    component.back()
+
+    // Assert
+    expect(component).toBeTruthy()
+    expect(window.history.back).toBeCalled()
+  })
+
   it('should fetch user on init', async () => {
     // Assert
     await firstValueFrom(userServiceGetById$)
