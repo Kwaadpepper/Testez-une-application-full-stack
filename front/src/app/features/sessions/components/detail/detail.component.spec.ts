@@ -89,6 +89,18 @@ describe('DetailComponent', () => {
     expect(component).toBeTruthy()
   })
 
+  it('should go back', () => {
+    // Arrange
+    window.history.back = jest.fn()
+
+    // Act
+    component.back()
+
+    // Assert
+    expect(component).toBeTruthy()
+    expect(window.history.back).toBeCalled()
+  })
+
   it('should fetch a session', async () => {
     // -- Arrange
     jest.spyOn(sessionApiService, 'detail')
