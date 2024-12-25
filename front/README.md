@@ -1,4 +1,10 @@
-# Yoga
+# Front part - Yoga App
+
+## Versions
+
+Node: 16/gallium
+Npm: 8.19.4
+Yarn: 1.22.22
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.1.0.
 
@@ -6,73 +12,89 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Git clone:
 
-> git clone https://github.com/OpenClassrooms-Student-Center/P5-Full-Stack-testing
+```sh
+git clone https://github.com/Kwaadpepper/Testez-une-application-full-stack
+```
 
-Go inside folder:
+Go to front part:
 
-> cd yoga
+```sh
+cd front
+```
 
 Install dependencies:
 
-> npm install
+```sh
+npm install
+```
 
 Launch Front-end:
 
-> npm run start;
-
+```sh
+npm run start
+```
 
 ## Ressources
 
-### Mockoon env 
-
 ### Postman collection
 
-For Postman import the collection
+Import the Postman collection
 
-> ressources/postman/yoga.postman_collection.json 
+> [../ressources/postman/yoga.postman_collection.json](./../ressources/postman/yoga.postman_collection.json)
 
-by following the documentation: 
+by following the documentation:
 
-https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman
-
+[importing-data-into-postman](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
 ### MySQL
 
-SQL script for creating the schema is available `ressources/sql/script.sql`
+SQL script for creating the schema is available [./../ressources/sql/script.sql](./../ressources/sql/script.sql)
 
 By default the admin account is:
-- login: yoga@studio.com
-- password: test!1234
 
+- login: `yoga@studio.com`
+- password: `test!1234`
 
-### Test
+## Testing
 
-#### E2E
+### E2E
 
 Launching e2e test:
 
-> npm run e2e
+```sh
+npm run e2e
+```
+
+or
+
+```sh
+npm run e2e:ci
+```
 
 Generate coverage report (you should launch e2e test before):
 
-> npm run e2e:coverage
+```sh
+npm run e2e:coverage
+```
 
-Report is available here:
+Report for **integration tests** will be available here:
 
-> front/coverage/lcov-report/index.html
+> [coverage/integration/lcov-report/index.html](coverage/integration/lcov-report/index.html)
 
-#### Unitary test
+### Unitary tests
 
-Launching test:
+Launching test with coverage:
 
-> npm run test
+```sh
+npm run test:coverage
+```
 
-for following change:
+Report for **unit tests** will be available here:
 
-> npm run test:watch
+> [coverage/unit/lcov-report/index.html](coverage/unit/lcov-report/index.html)
 
-## Versions
+To run while following changes:
 
-Node: 16/gallium
-Npm: 8.19.4
-Yarn: 1.22.22
+```sh
+npm run test:watch
+```
