@@ -77,9 +77,9 @@ Generate coverage report (you should launch e2e test before):
 npm run e2e:coverage
 ```
 
-Report for **integration tests** will be available here:
+Report for **end 2 end tests** will be available here:
 
-> [coverage/integration/lcov-report/index.html](coverage/integration/lcov-report/index.html)
+> [coverage/e2e/lcov-report/index.html](coverage/e2e/lcov-report/index.html)
 
 ### Unitary tests
 

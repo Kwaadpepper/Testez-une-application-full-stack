@@ -9,12 +9,12 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "e2e:ci": "ng run yoga:e2e-ci",
-    "e2e:coverage": "npx nyc report --reporter=lcov --reporter=text-summary --report-dir coverage/integration",
+    "e2e:coverage": "npx nyc report --reporter=lcov --reporter=text-summary --report-dir coverage/e2e",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
   },
   "nyc": {
-    "report-dir": "coverage/integration"
+    "report-dir": "coverage/e2e"
   },
   "private": true,
   "dependencies": {
