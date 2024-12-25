@@ -45,7 +45,7 @@ describe('DetailComponent', () => {
     description: "description",
     date: new Date(),
     teacher_id: mockTeacher.id,
-    users: [],
+    users: [3],
     createdAt: new Date(),
     updatedAt: new Date()
   }
@@ -141,11 +141,13 @@ describe('DetailComponent', () => {
     sessionApiService.participate = () => participate$ as Observable<never>
     jest.spyOn(sessionApiService, 'participate')
     jest.spyOn(sessionApiService, 'detail')
+    mockSession.users = [1, 3]
 
     // Act
     component.participate()
 
     // Assert
+    expect(component.isParticipate).toBeTruthy()
     expect(sessionApiService.participate).toHaveBeenCalled()
     await firstValueFrom(participate$)
     expect(sessionApiService.detail).toHaveBeenCalled()
@@ -157,11 +159,13 @@ describe('DetailComponent', () => {
     sessionApiService.unParticipate = () => unParticipate$ as Observable<never>
     jest.spyOn(sessionApiService, 'unParticipate')
     jest.spyOn(sessionApiService, 'detail')
+    mockSession.users = [3]
 
     // Act
     component.unParticipate()
 
     // Assert
+    expect(component.isParticipate).toBeFalsy()
     expect(sessionApiService.unParticipate).toHaveBeenCalled()
     await firstValueFrom(unParticipate$)
     expect(sessionApiService.detail).toHaveBeenCalled()
