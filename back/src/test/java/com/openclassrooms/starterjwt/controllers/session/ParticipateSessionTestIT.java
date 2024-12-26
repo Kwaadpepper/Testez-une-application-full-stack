@@ -44,7 +44,7 @@ public class ParticipateSessionTestIT {
     }
 
     @Test
-    void canGetSessionFromEndpoint() throws JSONException {
+    void canParticipateToSessionFromEndpoint() throws JSONException {
         RestAssured
                 .given()
                 .header("Authorization", "Bearer " + jwt)
@@ -56,5 +56,31 @@ public class ParticipateSessionTestIT {
                 .log().status()
                 .log().body()
                 .statusCode(200);
+    }
+
+    @Test
+    void cannotParticipateToSessionFromEndpointWithWrongId() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().post(BASE_URL + "/NotAnId/participate/3")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().post(BASE_URL + "/1/participate/NotAnId")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
     }
 }
