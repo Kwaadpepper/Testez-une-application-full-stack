@@ -14,6 +14,7 @@ import { firstValueFrom, of, Subject } from 'rxjs';
 import { SessionInformation } from './../../../../interfaces/sessionInformation.interface';
 
 import { By } from '@angular/platform-browser';
+import { ListComponent } from 'src/app/features/sessions/components/list/list.component';
 import { SessionService } from 'src/app/services/session.service';
 import { AuthService } from '../../services/auth.service';
 import { LoginComponent } from './login.component';
@@ -44,14 +45,17 @@ describe('LoginComponent', () => {
         { provide: SessionService }
       ],
       imports: [
-        RouterTestingModule,
+        RouterTestingModule.withRoutes([
+          { path: 'sessions', component: ListComponent },
+        ]),
         BrowserAnimationsModule,
         HttpClientTestingModule,
         MatCardModule,
         MatIconModule,
         MatFormFieldModule,
         MatInputModule,
-        ReactiveFormsModule]
+        ReactiveFormsModule,
+      ]
     })
       .compileComponents()
 
