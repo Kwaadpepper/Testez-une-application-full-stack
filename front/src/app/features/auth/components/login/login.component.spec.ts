@@ -155,8 +155,6 @@ describe('LoginComponent', () => {
     const inputPassword = divElement.querySelectorAll('input').item(1) as HTMLInputElement | null
     const submitButton = divElement.querySelector('button[type="submit"]') as HTMLButtonElement | null
 
-    console.log(divElement.querySelectorAll('input').item(0))
-
     // -- Act
     inputEmail!.value = 'user@example.net'
     inputEmail!.dispatchEvent(new Event('input'));
