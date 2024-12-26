@@ -77,4 +77,34 @@ public class GetUserTestIT {
                         hasEntry("firstName", "Admin"),
                         hasEntry("lastName", "Admin")));
     }
+
+    @Test
+    void cannotGetUserFromEndpointThatDoesNotExists() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().get(BASE_URL + "/9999")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(404);
+    }
+
+    @Test
+    void cannotGetUserFromEndpointWithWrongId() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().get(BASE_URL + "/NotAnId")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
+    }
 }
