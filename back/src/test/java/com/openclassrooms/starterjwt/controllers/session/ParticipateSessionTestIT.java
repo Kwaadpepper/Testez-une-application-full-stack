@@ -59,6 +59,36 @@ public class ParticipateSessionTestIT {
     }
 
     @Test
+    void canParticipateToSessionFromEndpointIfUserDoesNotExists() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().post(BASE_URL + "/1/participate/99999")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(404);
+    }
+
+    @Test
+    void canParticipateToSessionFromEndpointIfSessionDoesNotExists() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().post(BASE_URL + "/99999/participate/3")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(404);
+    }
+
+    @Test
     void cannotParticipateToSessionFromEndpointWithWrongId() throws JSONException {
         RestAssured
                 .given()
