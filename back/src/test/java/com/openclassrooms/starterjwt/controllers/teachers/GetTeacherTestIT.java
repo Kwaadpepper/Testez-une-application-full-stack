@@ -1,9 +1,7 @@
 package com.openclassrooms.starterjwt.controllers.teachers;
 
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasEntry;
-
 import org.assertj.core.api.Assertions;
+import org.hamcrest.Matchers;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,8 +71,37 @@ public class GetTeacherTestIT {
                 .log().status()
                 .log().body()
                 .statusCode(200)
-                .body("", allOf(
-                        hasEntry("firstName", "Margot"),
-                        hasEntry("lastName", "DELAHAYE")));
+                .body("firstName", Matchers.equalTo("Margot"))
+                .body("lastName", Matchers.equalTo("DELAHAYE"));
+    }
+
+    @Test
+    void cannotGetTeacherFromEndpointThatDoesNotExists() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().get(BASE_URL + "/999999")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(404);
+    }
+
+    @Test
+    void cannotGetTeacherFromEndpointWithWrongId() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().get(BASE_URL + "/NotAnId")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
     }
 }
