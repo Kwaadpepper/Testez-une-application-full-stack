@@ -44,7 +44,7 @@ public class RemoveParticipationSessionTestIT {
     }
 
     @Test
-    void canGetSessionFromEndpoint() throws JSONException {
+    void canRemoveParticipationOnSessionFromEndpoint() throws JSONException {
         RestAssured
                 .given()
                 .header("Authorization", "Bearer " + jwt)
@@ -56,5 +56,31 @@ public class RemoveParticipationSessionTestIT {
                 .log().status()
                 .log().body()
                 .statusCode(200);
+    }
+
+    @Test
+    void cannotRemoveParticipationOnSessionFromEndpointWithWrongId() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().delete(BASE_URL + "/NoAnId/participate/2")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().delete(BASE_URL + "/1/participate/NoAnId")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
     }
 }
