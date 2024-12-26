@@ -14,12 +14,12 @@
             <span class="ml1">Delete</span>
           </button>
           <div *ngIf="!isAdmin">
-            <button data-test-participate *ngIf="!isParticipate" mat-raised-button color="primary"
+            <button [attr.data-test-participate]="''" *ngIf="!isParticipate" mat-raised-button color="primary"
               (click)="participate()">
               <mat-icon>person_add</mat-icon>
               <span class="ml1">Participate</span>
             </button>
-            <button data-test-unparticipate *ngIf="isParticipate" mat-raised-button color="warn"
+            <button [attr.data-test-unparticipate]="''" *ngIf="isParticipate" mat-raised-button color="warn"
               (click)="unParticipate()">
               <mat-icon>person_remove</mat-icon>
               <span class="ml1">Do not participate</span>
@@ -36,7 +36,7 @@
         <mat-icon>
           people
         </mat-icon>
-        <span class="ml1">{{ teacher.firstName }} {{ teacher.lastName | uppercase }}</span>
+        <span data-test="teacher" class="ml1">{{ teacher.firstName }} {{ teacher.lastName | uppercase }}</span>
       </div>
     </mat-card-subtitle>
     <div mat-card-image fxLayoutAlign="center center">
@@ -57,7 +57,7 @@
           <span class="ml1">{{ session.date | date: 'longDate'}}</span>
         </div>
       </div>
-      <div class="description">
+      <div data-test-description class="description">
         <p>Description:</p>
         {{ session.description }}
         <br>

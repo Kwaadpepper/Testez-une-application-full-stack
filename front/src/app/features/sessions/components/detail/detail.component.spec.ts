@@ -1,17 +1,16 @@
-import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule, } from '@angular/router/testing';
 import { expect, jest } from '@jest/globals';
 import { firstValueFrom, lastValueFrom, Observable, of } from 'rxjs';
 
 import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
 import { Teacher } from 'src/app/interfaces/teacher.interface';
-
 import { TeacherService } from 'src/app/services/teacher.service';
 import { SessionService } from '../../../../services/session.service';
 import { Session } from '../../interfaces/session.interface';
@@ -27,6 +26,7 @@ describe('DetailComponent', () => {
   let sessionApiServiceDetails$: Observable<Session>
   let teacherService: TeacherService
   let teacherServiceDetails$: Observable<Teacher>
+  let httpTestingController: HttpTestingController
 
   const mockSessionInformation: Partial<SessionInformation> = {
     admin: true,
@@ -49,12 +49,19 @@ describe('DetailComponent', () => {
     createdAt: new Date(),
     updatedAt: new Date()
   }
+  const mockActivatedRoute = {
+    snapshot: {
+      paramMap: {
+        get: () => 1,
+      },
+    },
+  }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        HttpClientModule,
+        HttpClientTestingModule,
         MatIconModule,
         MatCardModule,
         MatSnackBarModule,
@@ -64,21 +71,21 @@ describe('DetailComponent', () => {
       providers: [
         { provide: SessionService },
         { provide: SessionApiService },
+        {
+          provide: ActivatedRoute,
+          useValue: mockActivatedRoute,
+        }
       ],
     })
       .compileComponents()
+
+    httpTestingController = TestBed.inject(HttpTestingController)
 
     sessionService = TestBed.inject(SessionService)
     sessionService.sessionInformation = mockSessionInformation as SessionInformation
 
     sessionApiService = TestBed.inject(SessionApiService)
-
-    sessionApiServiceDetails$ = of(mockSession)
-    sessionApiService.detail = () => sessionApiServiceDetails$
-
     teacherService = TestBed.inject(TeacherService)
-    teacherServiceDetails$ = of(mockTeacher)
-    teacherService.detail = () => teacherServiceDetails$
 
     fixture = TestBed.createComponent(DetailComponent)
     component = fixture.componentInstance
@@ -103,8 +110,15 @@ describe('DetailComponent', () => {
 
   it('should fetch a session', async () => {
     // -- Arrange
+    sessionApiServiceDetails$ = of(mockSession)
+    sessionApiService.detail = () => sessionApiServiceDetails$
+    teacherServiceDetails$ = of(mockTeacher)
+    teacherService.detail = () => teacherServiceDetails$
     jest.spyOn(sessionApiService, 'detail')
     jest.spyOn(teacherService, 'detail')
+
+    // Act
+    component.ngOnInit()
 
     // Assert
     await firstValueFrom(sessionApiServiceDetails$)
@@ -116,6 +130,10 @@ describe('DetailComponent', () => {
 
   it('should delete a session', async () => {
     // -- Arrange
+    sessionApiServiceDetails$ = of(mockSession)
+    sessionApiService.detail = () => sessionApiServiceDetails$
+    teacherServiceDetails$ = of(mockTeacher)
+    teacherService.detail = () => teacherServiceDetails$
     const matSnackBar = TestBed.inject(MatSnackBar)
     const router = TestBed.inject(Router)
     const sessionApiServiceDelete$ = of('')
@@ -137,6 +155,10 @@ describe('DetailComponent', () => {
 
   it('should participate', async () => {
     // Arrange
+    sessionApiServiceDetails$ = of(mockSession)
+    sessionApiService.detail = () => sessionApiServiceDetails$
+    teacherServiceDetails$ = of(mockTeacher)
+    teacherService.detail = () => teacherServiceDetails$
     const participate$ = of('')
     sessionApiService.participate = () => participate$ as Observable<never>
     jest.spyOn(sessionApiService, 'participate')
@@ -155,6 +177,10 @@ describe('DetailComponent', () => {
 
   it('should remove participation', async () => {
     // Arrange
+    sessionApiServiceDetails$ = of(mockSession)
+    sessionApiService.detail = () => sessionApiServiceDetails$
+    teacherServiceDetails$ = of(mockTeacher)
+    teacherService.detail = () => teacherServiceDetails$
     const unParticipate$ = of('')
     sessionApiService.unParticipate = () => unParticipate$ as Observable<never>
     jest.spyOn(sessionApiService, 'unParticipate')
@@ -170,5 +196,117 @@ describe('DetailComponent', () => {
     await firstValueFrom(unParticipate$)
     expect(sessionApiService.detail).toHaveBeenCalled()
   })
+
+  it('should display session information IT', () => {
+    // -- Arrange
+    const divElement: HTMLElement = fixture.nativeElement
+    mockActivatedRoute.snapshot.paramMap = {
+      get: () => 1,
+    }
+
+    // Act
+    httpTestingController.expectOne({
+      url: 'api/session/1',
+      method: 'GET'
+    }).flush(mockSession)
+    httpTestingController.expectOne({
+      url: 'api/teacher/1',
+      method: 'GET'
+    }).flush(mockTeacher)
+
+    fixture.detectChanges()
+
+    // Assert
+    expect((divElement!.querySelector('[data-test="teacher"]') as HTMLElement | null)!.textContent)
+      .toBe(`${mockTeacher.firstName} ${mockTeacher.lastName.toUpperCase()}`)
+    expect((divElement!.querySelector('[data-test-attendees=""]') as HTMLElement | null)!.textContent)
+      .toBe(`${mockSession.users.length} attendees`)
+    expect((divElement!.querySelector('[data-test-description=""]') as HTMLElement | null)!.textContent?.trim())
+      .toBe(`Description: ${mockSession.description}`)
+  })
+
+  it('should display remove button if user is an admin IT', () => {
+    // -- Arrange
+    mockSessionInformation.admin = true
+    mockSessionInformation.id = 1
+    mockSession.users = [1]
+    const divElement: HTMLElement = fixture.nativeElement
+    mockActivatedRoute.snapshot.paramMap = {
+      get: () => 1,
+    }
+
+    // Act
+    httpTestingController.expectOne({
+      url: 'api/session/1',
+      method: 'GET'
+    }).flush(mockSession)
+    httpTestingController.expectOne({
+      url: 'api/teacher/1',
+      method: 'GET'
+    }).flush(mockTeacher)
+
+    fixture.detectChanges()
+
+    // Assert
+    expect((divElement!.querySelector('[data-test-delete=""]') as HTMLElement | null)).toBeTruthy()
+  })
+
+  it('should display participate button if a user is not participating IT', fakeAsync(() => {
+    // -- Arrange
+    component.isAdmin = false
+    mockSessionInformation.id = 1
+    mockSession.users = []
+    const divElement: HTMLElement = fixture.nativeElement
+    mockActivatedRoute.snapshot.paramMap = {
+      get: () => 1,
+    }
+
+    // Act
+    const getSessionsReqs = httpTestingController.expectOne({
+      url: 'api/session/1',
+      method: 'GET'
+    }).flush(mockSession)
+    httpTestingController.expectOne({
+      url: 'api/teacher/1',
+      method: 'GET'
+    }).flush(mockTeacher)
+
+    fixture.detectChanges()
+    tick(1000)
+
+    // Assert
+    expect(component.isAdmin).toBeFalsy()
+    expect(component.isParticipate).toBeFalsy()
+    expect((divElement!.querySelector('button[data-test-participate=""]') as HTMLElement | null)).toBeTruthy()
+  }))
+
+  it('should display unparticipate button if a user is participating IT', fakeAsync(() => {
+    // -- Arrange
+    component.isAdmin = false
+    mockSessionInformation.id = 1
+    mockSession.users = [1]
+    const divElement: HTMLElement = fixture.nativeElement
+    mockActivatedRoute.snapshot.paramMap = {
+      get: () => 1,
+    }
+
+    // Act
+    httpTestingController.expectOne({
+      url: 'api/session/1',
+      method: 'GET'
+    }).flush(mockSession)
+    httpTestingController.expectOne({
+      url: 'api/teacher/1',
+      method: 'GET'
+    }).flush(mockTeacher)
+
+    fixture.detectChanges()
+    tick(1000)
+
+    // Assert
+    expect(component.isAdmin).toBeFalsy()
+    expect(component.isParticipate).toBeTruthy()
+    expect((divElement!.querySelector('button[data-test-unparticipate=""]') as HTMLElement | null)).toBeTruthy()
+  }))
 })
 
