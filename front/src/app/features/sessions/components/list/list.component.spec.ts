@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { expect } from '@jest/globals';
 
+import { RouterTestingModule } from '@angular/router/testing';
 import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
 import { Teacher } from 'src/app/interfaces/teacher.interface';
 import { SessionService } from 'src/app/services/session.service';
@@ -46,6 +47,7 @@ describe('ListComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ListComponent],
       imports: [
+        RouterTestingModule,
         HttpClientTestingModule,
         MatCardModule,
         MatIconModule
