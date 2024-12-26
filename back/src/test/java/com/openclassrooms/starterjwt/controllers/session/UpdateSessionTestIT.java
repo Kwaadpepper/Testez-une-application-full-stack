@@ -54,7 +54,7 @@ public class UpdateSessionTestIT {
     }
 
     @Test
-    void canCreateSessionFromEndpoint() throws JSONException {
+    void canUpdateSessionFromEndpoint() throws JSONException {
         // Arrange
         Long sessionId = 3L;
         Session session = sessionService.getById(sessionId);
@@ -80,5 +80,33 @@ public class UpdateSessionTestIT {
                 .log().body()
                 .statusCode(200)
                 .body("name", Matchers.equalTo(newSessionName));
+    }
+
+    @Test
+    void cannotUpdateSessionFromEndpointUsingWrongID() throws JSONException {
+        // Arrange
+        Long sessionId = 3L;
+        Session session = sessionService.getById(sessionId);
+        Assertions.assertThat(session).isNotNull();
+        String newSessionName = "newSessionName";
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .body(
+                        (new JSONObject())
+                                .put("name", newSessionName)
+                                .put("description", session.getDescription())
+                                .put("date", new SimpleDateFormat("yyyy-MM-dd").format(session.getDate()))
+                                .put("teacher_id", session.getTeacher().getId())
+                                .toString())
+                .log().uri()
+                .log().method()
+                .when().put(BASE_URL + "/notanId")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
     }
 }
