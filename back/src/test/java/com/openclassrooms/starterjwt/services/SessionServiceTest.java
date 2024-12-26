@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.openclassrooms.starterjwt.exception.BadRequestException;
+import com.openclassrooms.starterjwt.exception.NotFoundException;
 import com.openclassrooms.starterjwt.models.Session;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.SessionRepository;
@@ -184,6 +185,25 @@ public class SessionServiceTest {
     }
 
     @Test
+    public void cannotParticipateIfSessionIsMissing() {
+        // Assert
+        Assertions.assertThatCode(() -> {
+            // Arrange
+            User user = getNewUser();
+            Long sessionId = 3L;
+            Long userId = 4L;
+
+            Mockito.when(user.getId()).thenReturn(userId);
+            Mockito.when(sessionRepository.findById(Mockito.any(Long.class)))
+                    .thenReturn(Optional.ofNullable(null));
+
+            // Act
+            sessionService.participate(sessionId, userId);
+        }).isInstanceOf(NotFoundException.class)
+                .as("Cannot participate if session is missing");
+    }
+
+    @Test
     public void canCancelParticipation() {
         // Arrange
         Session session = new Session();
@@ -210,7 +230,7 @@ public class SessionServiceTest {
     }
 
     @Test
-    public void canCancelParticipationIfNotParticipating() {
+    public void cannotCancelParticipationIfNotParticipating() {
         // Assert
         Assertions.assertThatCode(() -> {
             // Arrange
@@ -226,6 +246,25 @@ public class SessionServiceTest {
             sessionService.noLongerParticipate(sessionId, userId);
         }).isInstanceOf(BadRequestException.class)
                 .as("A user that does not participate cannot cancel his participation");
+    }
+
+    @Test
+    public void canCancelParticipationIfSessionIsMissing() {
+        // Assert
+        Assertions.assertThatCode(() -> {
+            // Arrange
+            Session session = new Session();
+            session.setUsers(List.of());
+
+            Long sessionId = 3L;
+            Long userId = 4L;
+            Mockito.when(sessionRepository.findById(Mockito.any(Long.class)))
+                    .thenReturn(Optional.ofNullable(null));
+
+            // Act
+            sessionService.noLongerParticipate(sessionId, userId);
+        }).isInstanceOf(NotFoundException.class)
+                .as("Cannot cancel his participation if the session does not exists");
     }
 
     private User getNewUser() {
