@@ -1,3 +1,5 @@
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -5,19 +7,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { expect, jest } from '@jest/globals';
-import { SessionService } from 'src/app/services/session.service';
-import { SessionApiService } from '../../services/session-api.service';
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+
 import { Subject } from 'rxjs';
 import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
 import { Teacher } from 'src/app/interfaces/teacher.interface';
+import { SessionService } from 'src/app/services/session.service';
+import { TeacherService } from 'src/app/services/teacher.service';
 import { Session } from '../../interfaces/session.interface';
+import { SessionApiService } from '../../services/session-api.service';
 import { FormComponent } from './form.component';
 
 describe('FormComponent', () => {
@@ -27,6 +31,7 @@ describe('FormComponent', () => {
   let sessionService: SessionService
   let matSnackBar: MatSnackBar
   let sessionApiService: SessionApiService
+  let httpTestingController: HttpTestingController
 
   const mockSessionInformation: Partial<SessionInformation> = {
     admin: true,
@@ -74,9 +79,9 @@ describe('FormComponent', () => {
         ReactiveFormsModule,
         MatSnackBarModule,
         MatSelectModule,
-        BrowserAnimationsModule
+        NoopAnimationsModule
       ],
-      providers: [SessionService, SessionApiService, {
+      providers: [SessionService, TeacherService, SessionApiService, {
         provide: ActivatedRoute,
         useValue: mockActivatedRoute,
       }, {
@@ -86,6 +91,8 @@ describe('FormComponent', () => {
       declarations: [FormComponent]
     })
       .compileComponents()
+
+    httpTestingController = TestBed.inject(HttpTestingController)
 
     router = TestBed.inject(Router)
 
@@ -210,6 +217,191 @@ describe('FormComponent', () => {
     // Assert
     expect(sessionApiService.update).toHaveBeenCalled()
     expect(matSnackBar.open).toHaveBeenCalledWith('Session updated !', 'Close', {'duration': 3000})
+    expect(router.navigate).toHaveBeenCalledWith(['sessions'])
+  }))
+
+  it('should update a session IT', fakeAsync(async () => {
+    // Arrange
+    mockRouter.url = '/sessions/update'
+    mockSessionInformation.admin = true
+    const sessionApiService = TestBed.inject(SessionApiService)
+    fixture = TestBed.createComponent(FormComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+
+    jest.spyOn(sessionApiService, 'update')
+    jest.spyOn(matSnackBar, 'open')
+    jest.spyOn(router, 'navigate')
+
+    // Act
+
+    httpTestingController.expectOne({
+      url: 'api/session/1',
+      method: 'GET'
+    }).flush(mockSession, { status: 200, statusText: '' })
+    tick(1000)
+    fixture.detectChanges()
+    const divElement: HTMLElement = fixture.nativeElement
+    const inputName = divElement.querySelectorAll('input').item(0) as HTMLInputElement | null
+    const submitButton = divElement.querySelector('button[type="submit"]') as HTMLButtonElement | null
+    inputName!.value = "session description"
+    inputName!.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    submitButton!.click()
+    httpTestingController.expectOne({
+      url: 'api/session/1',
+      method: 'PUT'
+    }).flush({}, { status: 200, statusText: '' })
+    tick(1000)
+
+    // Assert
+    expect(submitButton!.disabled).toBeFalsy()
+    expect(component!.sessionForm).toBeTruthy()
+    expect(sessionApiService.update).toHaveBeenCalled()
+    expect(matSnackBar.open).toHaveBeenCalledWith('Session updated !', 'Close', {'duration': 3000})
+    expect(router.navigate).toHaveBeenCalledWith(['sessions'])
+  }))
+
+  it('should not update a session if elements are missing IT', fakeAsync(async () => {
+    // Arrange
+    mockRouter.url = '/sessions/update'
+    mockSessionInformation.admin = true
+    const sessionApiService = TestBed.inject(SessionApiService)
+    fixture = TestBed.createComponent(FormComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+
+    jest.spyOn(sessionApiService, 'update')
+    jest.spyOn(matSnackBar, 'open')
+    jest.spyOn(router, 'navigate')
+
+    // Act
+
+    httpTestingController.expectOne({
+      url: 'api/session/1',
+      method: 'GET'
+    }).flush(mockSession, { status: 200, statusText: '' })
+    tick(1000)
+    fixture.detectChanges()
+    const divElement: HTMLElement = fixture.nativeElement
+    const inputName = divElement.querySelectorAll('input').item(0) as HTMLInputElement | null
+    const submitButton = divElement.querySelector('button[type="submit"]') as HTMLButtonElement | null
+    inputName!.value = ""
+    inputName!.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    submitButton!.click()
+    tick(1000)
+
+    // Assert
+    expect(submitButton!.disabled).toBeTruthy()
+    expect(component!.sessionForm).toBeTruthy()
+    expect(sessionApiService.update).not.toHaveBeenCalled()
+  }))
+
+  it('should not create a session if elements are missing IT', fakeAsync(async () => {
+    // Arrange
+    mockRouter.url = '/sessions/create'
+    mockSessionInformation.admin = true
+    const sessionApiService = TestBed.inject(SessionApiService)
+    fixture = TestBed.createComponent(FormComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+    let loader = TestbedHarnessEnvironment.loader(fixture);
+
+    const divElement: HTMLElement = fixture.nativeElement
+    const inputName = divElement.querySelectorAll('input').item(0) as HTMLInputElement | null
+    const inputDate = divElement.querySelectorAll('input').item(1) as HTMLInputElement | null
+    const selectTeacher = (await loader.getAllHarnesses(MatSelectHarness))[0];
+    const inputDescription = divElement.querySelectorAll('textarea').item(0) as HTMLTextAreaElement | null
+    const submitButton = divElement.querySelector('button[type="submit"]') as HTMLButtonElement | null
+    fixture.detectChanges()
+
+    jest.spyOn(sessionApiService, 'create')
+    jest.spyOn(matSnackBar, 'open')
+
+    // Act
+    httpTestingController.expectOne({
+      url: 'api/teacher',
+      method: 'GET'
+    }).flush([mockTeacher])
+    tick(1000)
+    inputName!.value = ""
+    inputName!.dispatchEvent(new Event('input'))
+    inputDate!.value = new Date().toISOString().split('T')[0]
+    inputDate!.dispatchEvent(new Event('input'))
+    // Select first teacher
+    await selectTeacher.open()
+    await selectTeacher.clickOptions()
+    await selectTeacher.close()
+    fixture.detectChanges()
+    inputDescription!.value = "session description"
+    inputDescription!.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    submitButton!.click()
+    tick(1000)
+    httpTestingController.expectNone({
+      url: 'api/session',
+      method: 'POST'
+    })
+    tick(1000)
+
+    // Assert
+    expect(submitButton!.disabled).toBeTruthy()
+    expect(sessionApiService.create).not.toHaveBeenCalled()
+    expect(matSnackBar.open).not.toHaveBeenCalled()
+  }))
+
+  it('should create a session IT', fakeAsync(async () => {
+    // Arrange
+    mockRouter.url = '/sessions/create'
+    mockSessionInformation.admin = true
+    const sessionApiService = TestBed.inject(SessionApiService)
+    fixture = TestBed.createComponent(FormComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+    let loader = TestbedHarnessEnvironment.loader(fixture);
+
+    const divElement: HTMLElement = fixture.nativeElement
+    const inputName = divElement.querySelectorAll('input').item(0) as HTMLInputElement | null
+    const inputDate = divElement.querySelectorAll('input').item(1) as HTMLInputElement | null
+    const selectTeacher = (await loader.getAllHarnesses(MatSelectHarness))[0];
+    const inputDescription = divElement.querySelectorAll('textarea').item(0) as HTMLTextAreaElement | null
+    const submitButton = divElement.querySelector('button[type="submit"]') as HTMLButtonElement | null
+    fixture.detectChanges()
+
+    jest.spyOn(sessionApiService, 'create')
+    jest.spyOn(matSnackBar, 'open')
+    jest.spyOn(router, 'navigate')
+
+    // Act
+    httpTestingController.expectOne({
+      url: 'api/teacher',
+      method: 'GET'
+    }).flush([mockTeacher])
+    tick(1000)
+    inputName!.value = "session name"
+    inputName!.dispatchEvent(new Event('input'))
+    inputDate!.value = new Date().toISOString().split('T')[0]
+    inputDate!.dispatchEvent(new Event('input'))
+    // Select first teacher
+    await selectTeacher.open()
+    await selectTeacher.clickOptions()
+    await selectTeacher.close()
+    fixture.detectChanges()
+    inputDescription!.value = "session description"
+    inputDescription!.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    submitButton!.click()
+    tick(1000)
+    httpTestingController.expectOne({
+      url: 'api/session',
+      method: 'POST'
+    }).flush({}, { status: 200, statusText: '' })
+    tick(1000)
+
+    // Assert
+    expect(sessionApiService.create).toHaveBeenCalled()
+    expect(matSnackBar.open).toHaveBeenCalledWith('Session created !', 'Close', {'duration': 3000})
     expect(router.navigate).toHaveBeenCalledWith(['sessions'])
   }))
 })
