@@ -11,7 +11,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.openclassrooms.starterjwt.exception.BadRequestException;
 import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
+import com.openclassrooms.starterjwt.services.SessionService;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -24,6 +26,9 @@ public class ParticipateSessionTestIT {
 
     @Autowired
     AuthenticationManager authenticationManager;
+
+    @Autowired
+    private SessionService sessionService;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -56,6 +61,37 @@ public class ParticipateSessionTestIT {
                 .log().status()
                 .log().body()
                 .statusCode(200);
+    }
+
+    @Test
+    void cannotParticipateToSessionFromEndpointIfAlreadyParticipating() throws JSONException {
+        try {
+            sessionService.noLongerParticipate(1L, 3L);
+        } catch (BadRequestException e) {
+        } finally {
+            RestAssured
+                    .given()
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(ContentType.JSON)
+                    .log().uri()
+                    .log().method()
+                    .when().post(BASE_URL + "/1/participate/3")
+                    .then()
+                    .log().status()
+                    .log().body()
+                    .statusCode(200);
+            RestAssured
+                    .given()
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(ContentType.JSON)
+                    .log().uri()
+                    .log().method()
+                    .when().post(BASE_URL + "/1/participate/3")
+                    .then()
+                    .log().status()
+                    .log().body()
+                    .statusCode(400);
+        }
     }
 
     @Test
