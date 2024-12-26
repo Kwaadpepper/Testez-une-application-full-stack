@@ -1,0 +1,10 @@
+{
+  "id": 1,
+  "name": "New session",
+  "description": "New session description",
+  "date": "2021/02/22",
+  "teacher_id": 1,
+  "users": [],
+  "createdAt": "2021/02/22",
+  "updatedAt": "2021/02/22"
+}

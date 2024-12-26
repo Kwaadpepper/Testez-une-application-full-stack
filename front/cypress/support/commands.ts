@@ -3,11 +3,31 @@
 // with Intellisense and code completion in your
 // IDE or Text Editor.
 // ***********************************************
-// declare namespace Cypress {
-//   interface Chainable<Subject = any> {
-//     customCommand(param: any): typeof customCommand;
-//   }
-// }
+import session from "./../fixtures/session.json";
+declare namespace Cypress {
+  interface Chainable<Subject = any> {
+    login(sessions: typeof session[], isAdmin: boolean): typeof loginCommand;
+  }
+}
+
+function loginCommand(sessions = [], isAdmin = true) {
+  cy.visit('/login')
+  cy.fixture('user').then((user) => {
+    user.admin = isAdmin
+    cy.intercept('POST', '/api/auth/login', { body: user }).as('getUser')
+  })
+
+  cy.intercept(
+    {
+      method: 'GET',
+      url: '/api/session',
+    },
+    sessions).as('session')
+
+  cy.get('input[formControlName=email]').type("yoga@studio.com")
+  cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+}
+
 //
 // function customCommand(param: any): void {
 //   console.warn(param);
@@ -15,6 +35,8 @@
 //
 // NOTE: You can use it like so:
 // Cypress.Commands.add('customCommand', customCommand);
+Cypress.Commands.add('login', loginCommand);
+
 //
 // ***********************************************
 // This example commands.js shows you how to

@@ -4,6 +4,8 @@
     "isolatedModules": false
   },
   "include": [
-    "../node_modules/cypress"
-  ]
+    "../node_modules/cypress",
+    "support/*.d.ts"
+  ],
+  "exclude": []
 }
