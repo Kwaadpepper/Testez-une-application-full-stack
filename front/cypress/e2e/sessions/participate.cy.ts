@@ -20,7 +20,6 @@ describe('Participate to a session spec', () => {
 
           cy.intercept('POST', '/api/session/1/participate/1', { statusCode: 200 }).as("Participate")
           cy.intercept('GET', '/api/session/1', (req) => {
-            console.log(requestNo)
             req.reply({ body: sessionResponses[requestNo++] })
           }).as("GetSession")
           cy.intercept('GET', '/api/teacher/1', { body: teacher }).as("GetTeacher")
