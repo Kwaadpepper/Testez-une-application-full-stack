@@ -59,6 +59,36 @@ public class RemoveParticipationSessionTestIT {
     }
 
     @Test
+    void cannotRemoveParticipationOnSessionFromEndpointIfUserDoesNotExists() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().delete(BASE_URL + "/1/participate/99999")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
+    }
+
+    @Test
+    void cannotRemoveParticipationOnSessionFromEndpointIfSessionDoesNotExists() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().delete(BASE_URL + "/99999/participate/2")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(404);
+    }
+
+    @Test
     void cannotRemoveParticipationOnSessionFromEndpointWithWrongId() throws JSONException {
         RestAssured
                 .given()
