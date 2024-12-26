@@ -9,9 +9,11 @@ import { Router } from '@angular/router';
 import { expect, jest } from '@jest/globals';
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { Subject } from 'rxjs';
 import { SessionService } from 'src/app/services/session.service';
 import { AuthService } from '../../services/auth.service';
+import { LoginComponent } from '../login/login.component';
 import { RegisterComponent } from './register.component';
 
 describe('RegisterComponent', () => {
@@ -32,7 +34,10 @@ describe('RegisterComponent', () => {
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule
+        MatInputModule,
+        RouterTestingModule.withRoutes([
+          { path: 'login', component: LoginComponent }
+        ])
       ]
     })
       .compileComponents()
