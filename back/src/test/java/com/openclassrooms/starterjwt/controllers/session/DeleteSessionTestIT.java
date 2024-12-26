@@ -69,4 +69,40 @@ public class DeleteSessionTestIT {
         session = sessionService.getById(2L);
         Assertions.assertThat(session).isNull();
     }
+
+    @Test
+    void cannotDeleteSessionFromEndpointThatDoesNotExists() throws JSONException {
+        Long sessionId = 999999L;
+        Session session = sessionService.getById(sessionId);
+        Assertions.assertThat(session).isNull();
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().delete(BASE_URL + "/" + sessionId)
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(404);
+    }
+
+    @Test
+    void cannotDeleteSessionFromEndpointWithWrongId() throws JSONException {
+        String sessionId = "Not an Id";
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().delete(BASE_URL + "/" + sessionId)
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
+    }
 }
