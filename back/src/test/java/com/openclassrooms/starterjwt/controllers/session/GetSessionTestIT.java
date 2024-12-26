@@ -53,7 +53,7 @@ public class GetSessionTestIT {
     }
 
     @Test
-    void canGetSessionsList() {
+    void canGetSession() {
         Session session = sessionService.getById(1L);
         Assertions.assertThat(session)
                 .returns("Session name", Assertions.from(Session::getName))
@@ -76,5 +76,35 @@ public class GetSessionTestIT {
                 .body("", allOf(
                         hasEntry("name", "Session name"),
                         hasEntry("description", "Session description")));
+    }
+
+    @Test
+    void cannotGetMissingSessionFromEndpoint() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().get(BASE_URL + "/9999")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(404);
+    }
+
+    @Test
+    void cannotGetSessionUsingWrongIdFromEndpoint() throws JSONException {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(ContentType.JSON)
+                .log().uri()
+                .log().method()
+                .when().get(BASE_URL + "/notnadid")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(400);
     }
 }
